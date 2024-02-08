@@ -11,7 +11,7 @@ from llama_index.program import OpenAIPydanticProgram
 from llama_index.output_parsers import PydanticOutputParser
 from llama_index.llms import OpenAI
 #from schema import InsAds, ActivityTypeEnum, MediaTypeEnum  #Imports schema for CFM invoices.
-from schema import MenuItem, ActivityTypeEnum, MediaTypeEnum # Imports Menu Item Schema
+from MenuItem import MenuItem, ActivityTypeEnum, MediaTypeEnum # Imports Menu Item Schema
 
 
 # Authentication function using environment variables for secrets
