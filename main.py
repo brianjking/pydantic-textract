@@ -9,6 +9,7 @@ import hmac
 from llama_index.program import OpenAIPydanticProgram
 from llama_index.output_parsers import PydanticOutputParser
 from llama_index.llms import OpenAI
+from schema import InsAds, ActivityTypeEnum, MediaTypeEnum 
 
 
 
@@ -36,46 +37,6 @@ def check_password():
 # Check password before proceeding
 if not check_password():
     st.stop()  # Do not continue if check_password is not True.
-
-# Existing code below...
-class ActivityTypeEnum(str, Enum):
-    DirectMail = "DirectMail"
-    LocalAd = "LocalAd"
-    # Define other activity types...
-
-class MediaTypeEnum(str, Enum):
-    Print = "Print"
-    Outdoor = "Outdoor"
-    # Define other media types...
-
-class InsAds(BaseModel):
-    """Data model for a CFM."""
-    vendor_merchant_name: str
-    bill_invoice_amount: str
-    date_of_invoice: str
-    media_type: MediaTypeEnum
-    activity_type: ActivityTypeEnum
-    comments: str
-    description: str
-    account_id_number: str
-    invoice: str
-
-    @classmethod
-    def validate_enum(cls, v, field):
-        if field.name == 'media_type':
-            enum_type = MediaTypeEnum
-        elif field.name == 'activity_type':
-            enum_type = ActivityTypeEnum
-        else:
-            return v
-        try:
-            return enum_type(v)
-        except ValueError:
-            raise ValueError(f"Value {v} is not a valid {enum_type}")
-
-    @validator('*')
-    def validate_enums(cls, v, field):
-        return cls.validate_enum(v, field)
 
 # AWS Textract client configuration using environment variables
 
