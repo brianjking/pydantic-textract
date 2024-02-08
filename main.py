@@ -84,6 +84,7 @@ textract_client = boto3.client(
     region_name=os.environ.get("aws_region_name"),
     aws_access_key_id=os.environ.get("aws_access_key_id"),
     aws_secret_access_key=os.environ.get("aws_secret_access_key")
+)
 
     # Updated OpenAI client initialization using the environment variable for the API key
 openai_client = OpenAI(
