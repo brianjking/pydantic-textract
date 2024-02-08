@@ -5,5 +5,5 @@ pillow
 matplotlib
 boto3
 streamlit
-
+pdf2image
 
