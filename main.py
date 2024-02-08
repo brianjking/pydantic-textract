@@ -65,7 +65,7 @@ def extract_text_from_textract(textract_response):
 
 def call_llama_index_to_process_data(extracted_text):
     prompt_template_str = f"""\
-    Based on the following extracted text, fill out the information fields accurately without adding any details not present in the text. If a detail is not mentioned, explicitly mark it as 'Unknown'. Here is the text: {extracted_text}
+    Based on the following extracted text from a bill / invoice / receipt, carefully fill out the information fields accurately without adding any details not present in the text. If a detail is not mentioned, explicitly mark it as 'Unknown'. If you do a good job, you will receive a $200 tip. Carefully work step by step and review the entire text for context, you're an expert at processing this data. Here is the text: {extracted_text}
     """
     try:
         program = OpenAIPydanticProgram.from_defaults(
