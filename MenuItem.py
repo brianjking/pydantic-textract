@@ -5,7 +5,7 @@ class MenuItem(BaseModel):
     brand: constr(strip_whitespace=True, min_length=1)  # Non-empty string that trims whitespace
     product: constr(strip_whitespace=True, min_length=1)  # Non-empty string that trims whitespace
     ingredients: List[constr(strip_whitespace=True, min_length=1)]  # List of non-empty strings
-    price: Decimal  # Use Decimal for accurate financial calculations
+    price: float  # Changed from Decimal to float for simplicity
     size: constr(strip_whitespace=True, min_length=1)  # Description of size, e.g., '500ml', '1 pint'
     description: constr(strip_whitespace=True, min_length=1)  # Non-empty string
 
