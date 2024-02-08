@@ -10,6 +10,8 @@ from llama_index.program import OpenAIPydanticProgram
 from llama_index.output_parsers import PydanticOutputParser
 from llama_index.llms import OpenAI
 
+
+
 # Authentication function updated to use environment variables for secrets
 def check_password():
     """Returns `True` if the user had the correct password using environment variables."""
@@ -76,10 +78,20 @@ class InsAds(BaseModel):
         return cls.validate_enum(v, field)
 
 # AWS Textract client configuration using environment variables
-textract_client = boto3.client(service_name='textract',
-                               region_name=os.environ.get("aws_region_name"))
 
-openai_client = OpenAI(model="gpt-4-0125-preview")
+textract_client = boto3.client(
+    service_name='textract',
+    region_name=os.environ.get("aws_region_name"),
+    aws_access_key_id=os.environ.get("aws_access_key_id"),
+    aws_secret_access_key=os.environ.get("aws_secret_access_key")
+
+    # Updated OpenAI client initialization using the environment variable for the API key
+openai_client = OpenAI(
+    model="gpt-4-0125-preview",
+    api_key=os.environ.get("openai_api_key")
+)
+
+#openai_client = OpenAI(model="gpt-4-0125-preview")
 
 def process_image_with_textract(image_bytes):
     try:
