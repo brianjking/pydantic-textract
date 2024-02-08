@@ -5,4 +5,5 @@ pillow
 matplotlib
 boto3
 streamlit
+hmac
 
