@@ -56,6 +56,8 @@ class InsAds(BaseModel):
     account_id_number: str
     invoice: str
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator('media_type', 'activity_type', pre=True)
     def default_unknown_enum(cls, v, field):
         if field.name == 'media_type':
@@ -69,6 +71,8 @@ class InsAds(BaseModel):
             except ValueError:
                 return ActivityTypeEnum.Unknown
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator('activity_type')
     def validate_activity_type(cls, v, values, **kwargs):
         if 'media_type' in values:
