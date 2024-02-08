@@ -1,35 +1,32 @@
+import os
 from pydantic import BaseModel, ValidationError, validator
 from enum import Enum
 import streamlit as st
 import boto3
 from PIL import Image
 import io
-import hmac  # Import required for the authentication
+import hmac
 from llama_index.program import OpenAIPydanticProgram
 from llama_index.output_parsers import PydanticOutputParser
 from llama_index.llms import OpenAI
-from schema import InsAds
 
-# Authentication function
+# Authentication function updated to use environment variables for secrets
 def check_password():
-    """Returns `True` if the user had the correct password."""
-
+    """Returns `True` if the user had the correct password using environment variables."""
     def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+        # Fetch the password from an environment variable
+        if hmac.compare_digest(st.session_state["password"],
+                               os.environ.get("password")):
             st.session_state["password_correct"] = True
             del st.session_state["password"]  # Don't store the password.
         else:
             st.session_state["password_correct"] = False
 
-    # Return True if the password is validated.
     if st.session_state.get("password_correct", False):
         return True
 
-    # Show input for password.
-    st.text_input(
-        "Password", type="password", on_change=password_entered, key="password"
-    )
+    # Show input for password
+    st.text_input("Password", type="password", on_change=password_entered, key="password")
     if "password_correct" in st.session_state:
         st.error("😕 Password incorrect")
     return False
@@ -37,8 +34,6 @@ def check_password():
 # Check password before proceeding
 if not check_password():
     st.stop()  # Do not continue if check_password is not True.
-
-
 
 # Existing code below...
 class ActivityTypeEnum(str, Enum):
@@ -74,16 +69,15 @@ class InsAds(BaseModel):
         try:
             return enum_type(v)
         except ValueError:
-            return enum_type.Unknown
+            raise ValueError(f"Value {v} is not a valid {enum_type}")
 
     @validator('*')
     def validate_enums(cls, v, field):
         return cls.validate_enum(v, field)
 
-textract_client = boto3.client(
-    service_name='textract',
-    region_name=st.secrets["aws_region_name"]
-)
+# AWS Textract client configuration using environment variables
+textract_client = boto3.client(service_name='textract',
+                               region_name=os.environ.get("aws_region_name"))
 
 openai_client = OpenAI(model="gpt-4-0125-preview")
 
@@ -94,7 +88,7 @@ def process_image_with_textract(image_bytes):
     except Exception as e:
         st.error(f"Error processing document with Textract: {e}")
         return None
-    
+
 def extract_text_from_textract(textract_response):
     text = ""
     if textract_response:
