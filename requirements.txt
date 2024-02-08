@@ -1,6 +1,6 @@
 openai
 llama-index 
-pydantic
+pydantic==1.10.14
 pillow
 matplotlib
 boto3
