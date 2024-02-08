@@ -51,47 +51,27 @@ class InsAds(BaseModel):
     date_of_invoice: str
     media_type: MediaTypeEnum
     activity_type: ActivityTypeEnum
-    comments: str
-    description: str
-    account_id_number: str
-    invoice: str
+    comments: str = ""
+    description: str = ""
+    account_id_number: str = ""
+    invoice: str = ""
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator('media_type', 'activity_type', pre=True)
-    def default_unknown_enum(cls, v, field):
-        if field.name == 'media_type':
-            try:
-                return MediaTypeEnum(v)
-            except ValueError:
-                return MediaTypeEnum.Unknown
-        elif field.name == 'activity_type':
-            try:
-                return ActivityTypeEnum(v)
-            except ValueError:
-                return ActivityTypeEnum.Unknown
-
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator('activity_type')
-    def validate_activity_type(cls, v, values, **kwargs):
-        if 'media_type' in values:
-            media_type = values['media_type']
-            valid_activities = {
-                MediaTypeEnum.Print: [ActivityTypeEnum.DirectMail, ActivityTypeEnum.LocalAd, ActivityTypeEnum.RegionalAd, ActivityTypeEnum.Handouts, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Outdoor: [ActivityTypeEnum.Billboard, ActivityTypeEnum.ExternalBrandingSignage, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Point_of_Purchase: [ActivityTypeEnum.DealerDisplayAdvertising, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Broadcast: [ActivityTypeEnum.RadioAd, ActivityTypeEnum.TVAd, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Events: [ActivityTypeEnum.Tradeshows, ActivityTypeEnum.Exhibition, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Digital: [ActivityTypeEnum.eBlast, ActivityTypeEnum.MusicChannel, ActivityTypeEnum.PaidListing, ActivityTypeEnum.OnlineDisplayAd, ActivityTypeEnum.PaidSearch, ActivityTypeEnum.SocialAd, ActivityTypeEnum.SearchEngineOptimization, ActivityTypeEnum.BMISocialProgram, ActivityTypeEnum.BMIEmailProgram, ActivityTypeEnum.BMIPaidMedia, ActivityTypeEnum.CTV, ActivityTypeEnum.Kenect, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Facility_Branding: [ActivityTypeEnum.FacilityUpgrades, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Sponsorships: [ActivityTypeEnum.Sponsorship, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Signage: [ActivityTypeEnum.DealerSignage, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Vehicle_Wraps: [ActivityTypeEnum.VehicleWrapsDecals, ActivityTypeEnum.Unknown],
-                MediaTypeEnum.Unknown: [ActivityTypeEnum.Unknown],  # Allow Unknown as a valid combination
-            }
-            if v not in valid_activities.get(media_type, []):
-                raise ValueError(f"Invalid activity type {v} for media type {media_type}")
+    @validator('activity_type', pre=True, always=True)
+    def validate_activity_type(cls, v, values):
+        media_type = values.get('media_type')
+        valid_activities = {
+            MediaTypeEnum.Print: [ActivityTypeEnum.DirectMail, ActivityTypeEnum.LocalAd, ActivityTypeEnum.RegionalAd, ActivityTypeEnum.Handouts, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Outdoor: [ActivityTypeEnum.Billboard, ActivityTypeEnum.ExternalBrandingSignage, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Point_of_Purchase: [ActivityTypeEnum.DealerDisplayAdvertising, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Broadcast: [ActivityTypeEnum.RadioAd, ActivityTypeEnum.TVAd, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Events: [ActivityTypeEnum.Tradeshows, ActivityTypeEnum.Exhibition, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Digital: [ActivityTypeEnum.eBlast, ActivityTypeEnum.MusicChannel, ActivityTypeEnum.PaidListing, ActivityTypeEnum.OnlineDisplayAd, ActivityTypeEnum.PaidSearch, ActivityTypeEnum.SocialAd, ActivityTypeEnum.SearchEngineOptimization, ActivityTypeEnum.BMISocialProgram, ActivityTypeEnum.BMIEmailProgram, ActivityTypeEnum.BMIPaidMedia, ActivityTypeEnum.CTV, ActivityTypeEnum.Kenect, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Facility_Branding: [ActivityTypeEnum.FacilityUpgrades, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Sponsorships: [ActivityTypeEnum.Sponsorship, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Signage: [ActivityTypeEnum.DealerSignage, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Vehicle_Wraps: [ActivityTypeEnum.VehicleWrapsDecals, ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Unknown: [ActivityTypeEnum.Unknown],
+        }
+        if media_type and v not in valid_activities.get(media_type, []):
+            return ActivityTypeEnum.Unknown
         return v
-
-
