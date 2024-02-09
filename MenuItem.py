@@ -1,4 +1,4 @@
-from pydantic import BaseModel, conlist, constr, Decimal
+from pydantic import BaseModel, conlist, constr
 from typing import List
 
 class MenuItem(BaseModel):
