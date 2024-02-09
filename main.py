@@ -10,9 +10,7 @@ from pdf2image import convert_from_bytes  # Ensure this library is installed for
 from llama_index.program import OpenAIPydanticProgram
 from llama_index.output_parsers import PydanticOutputParser
 from llama_index.llms import OpenAI
-#from schema import InsAds, ActivityTypeEnum, MediaTypeEnum  #Imports schema for CFM invoices.
-from menuitem import MenuItem, ActivityTypeEnum, MediaTypeEnum # Imports Menu Item Schema
-
+from schema import InsAds, ActivityTypeEnum, MediaTypeEnum 
 
 # Authentication function using environment variables for secrets
 def check_password():
@@ -71,7 +69,7 @@ def call_llama_index_to_process_data(extracted_text):
     """
     try:
         program = OpenAIPydanticProgram.from_defaults(
-            output_parser=PydanticOutputParser(output_cls=MenuItems),
+            output_parser=PydanticOutputParser(output_cls=InsAds),
             output_cls=InsAds,
             prompt_template_str=prompt_template_str,
             llm=openai_client,
