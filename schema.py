@@ -1,5 +1,6 @@
-from pydantic import BaseModel, validator, ValidationError
+from pydantic import BaseModel, validator, ValidationError, constr
 from enum import Enum
+from typing import List
 
 class ActivityTypeEnum(str, Enum):
     DirectMail = "DirectMail"
@@ -44,8 +45,8 @@ class MediaTypeEnum(str, Enum):
     Vehicle_Wraps = "Vehicle Wraps"
     Unknown = "Unknown"
 
-class InsAds(BaseModel):
-    """Data model for a CFM."""
+class CFM(BaseModel):
+    """Data model for a CFM clai."""
     vendor_merchant_name: str
     bill_invoice_amount: str
     date_of_invoice: str
@@ -75,3 +76,17 @@ class InsAds(BaseModel):
         if media_type and v not in valid_activities.get(media_type, []):
             return ActivityTypeEnum.Unknown
         return v
+
+class Cocktail(BaseModel):
+    """Data model for individual cocktails on a menu."""
+    cocktail_name: constr(strip_whitespace=True, min_length=1)  # Name of the cocktail
+    brand: constr(strip_whitespace=True, min_length=1)  # Non-empty string that trims whitespace
+    product: constr(strip_whitespace=True, min_length=1)  # Non-empty string that trims whitespace
+    ingredients: List[constr(strip_whitespace=True, min_length=1)]  # List of non-empty strings that make up the cocktail
+    price: float  # Price of the cocktail
+    size: constr(strip_whitespace=True, min_length=1)  # Description of size, e.g., '500ml', '1 pint'
+    description: constr(strip_whitespace=True, min_length=1)  # Detailed description of the cocktail
+
+class Menu(BaseModel):
+    """Data model for processing a cocktail menu to a schema, containing multiple cocktails."""
+    cocktails: List[Cocktail]  # List of cocktails on the menu
