@@ -106,8 +106,9 @@ if uploaded_file is not None:
     textract_response = process_image_with_textract(image_bytes)
     extracted_text = extract_text_from_textract(textract_response)
 
-    st.subheader("Extracted Text:")
-    st.text(extracted_text)
+    # Using an expander for the extracted text
+    with st.expander("Extracted Text from Images"):
+        st.text_area("Extracted Text:", extracted_text, height=150)
 
     if extracted_text:
         structured_data = call_llama_index_to_process_data(extracted_text, selected_schema, selected_schema_name)
