@@ -5,6 +5,7 @@ from datetime import datetime
 
 
 class MediaTypeEnum(str, Enum):
+    """Data model for the media types on CFM invoices."""
     Print = "Print"
     Outdoor = "Outdoor"
     Point_of_Purchase = "Point of Purchase"
@@ -18,6 +19,7 @@ class MediaTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class ActivityTypeEnum(str, Enum):
+    """Data model for the CFM activity types."""
     DirectMail = "Direct Mail"
     LocalAd = "Local Ad"
     RegionalAd = "Regional Ad"
@@ -47,6 +49,7 @@ class ActivityTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class CFM(BaseModel):
+    """Data model for processing CFM co-op claim invoices and receipts."""
     vendor_merchant_name: str  # The company providing the service or product, issuing the invoice.
     bill_invoice_amount: str  # The original amount billed on the invoice.
     requested_amount: str = ""  # The amount being claimed, defaults to bill_invoice_amount if not provided.
