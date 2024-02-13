@@ -1,6 +1,8 @@
 from pydantic import BaseModel, validator, ValidationError, constr
 from enum import Enum
 from typing import List
+from datetime import datetime 
+
 
 class MediaTypeEnum(str, Enum):
     Print = "Print"
@@ -45,9 +47,12 @@ class ActivityTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class CFM(BaseModel):
-    vendor_merchant_name: str
-    bill_invoice_amount: str
-    date_of_invoice: str
+    vendor_merchant_name: str  # The company providing the service or product, issuing the invoice.
+    bill_invoice_amount: str  # The original amount billed on the invoice.
+    requested_amount: str = ""  # The amount being claimed, defaults to bill_invoice_amount if not provided.
+    date_of_invoice: datetime  # Invoice date, used as default for claim dates if they're not specified.
+    claim_start_date: datetime = None  # The start date for the claim period.
+    claim_end_date: datetime = None  # The end date for the claim period.
     media_type: MediaTypeEnum
     activity_type: ActivityTypeEnum
     comments: str = ""
@@ -55,6 +60,18 @@ class CFM(BaseModel):
     account_id_number: str = ""
     invoice: str = ""
 
+    @validator('claim_start_date', 'claim_end_date', pre=True, always=True)
+    def default_claim_dates(cls, v, values, field):
+        if v is None:
+            return values['date_of_invoice']
+        return v
+
+    @validator('requested_amount', pre=True, always=True)
+    def default_requested_amount(cls, v, values):
+        if not v:
+            return values['bill_invoice_amount']
+        return v
+        
     @validator('activity_type', pre=True, always=True)
     def validate_activity_type(cls, v, values):
         media_type = values.get('media_type')
