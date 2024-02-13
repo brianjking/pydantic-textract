@@ -53,8 +53,8 @@ class CFM(BaseModel):
     bill_invoice_amount: str
     requested_amount: str = ""
     date_of_invoice: str
-    claim_start_date: Optional[datetime] = None
-    claim_end_date: Optional[datetime] = None
+    claim_start_date: Optional[str] = None
+    claim_end_date: Optional[str] = None
     media_type: MediaTypeEnum
     activity_type: ActivityTypeEnum
     comments: str = ""
