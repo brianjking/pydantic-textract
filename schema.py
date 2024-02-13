@@ -4,6 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class MediaTypeEnum(str, Enum):
+    """Data model for the CFM media types."""
     Print = "Print"
     Outdoor = "Outdoor"
     Point_of_Purchase = "Point of Purchase"
@@ -17,6 +18,7 @@ class MediaTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class ActivityTypeEnum(str, Enum):
+    """Data model for the CFM activity types."""
     DirectMail = "Direct Mail"
     LocalAd = "Local Ad"
     RegionalAd = "Regional Ad"
@@ -46,6 +48,7 @@ class ActivityTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class CFM(BaseModel):
+    """Data model for the CFM types."""
     vendor_merchant_name: str
     bill_invoice_amount: str
     requested_amount: str = ""
@@ -98,6 +101,7 @@ class CFM(BaseModel):
         }
 
 class Cocktail(BaseModel):
+    """Data model for the Cocktail Menu items."""
     cocktail_name: str
     brand: str
     product: str
@@ -107,4 +111,5 @@ class Cocktail(BaseModel):
     description: str
 
 class Menu(BaseModel):
+    """Data model for the Menu."""
     cocktails: List[Cocktail]
