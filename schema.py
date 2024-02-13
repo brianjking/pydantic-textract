@@ -52,7 +52,7 @@ class CFM(BaseModel):
     vendor_merchant_name: str
     bill_invoice_amount: str
     requested_amount: str = ""
-    date_of_invoice: datetime
+    date_of_invoice: str
     claim_start_date: Optional[datetime] = None
     claim_end_date: Optional[datetime] = None
     media_type: MediaTypeEnum
