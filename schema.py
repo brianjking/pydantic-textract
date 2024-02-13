@@ -3,7 +3,6 @@ from enum import Enum
 from typing import List
 from datetime import datetime
 
-
 class MediaTypeEnum(str, Enum):
     """Data model for the media types on CFM invoices."""
     Print = "Print"
@@ -50,12 +49,12 @@ class ActivityTypeEnum(str, Enum):
 
 class CFM(BaseModel):
     """Data model for processing CFM co-op claim invoices and receipts."""
-    vendor_merchant_name: str  # The company providing the service or product, issuing the invoice.
-    bill_invoice_amount: str  # The original amount billed on the invoice.
-    requested_amount: str = ""  # The amount being claimed, defaults to bill_invoice_amount if not provided.
-    date_of_invoice: datetime  # Invoice date, used as default for claim dates if they're not specified.
-    claim_start_date: datetime = None  # The start date for the claim period.
-    claim_end_date: datetime = None  # The end date for the claim period.
+    vendor_merchant_name: str
+    bill_invoice_amount: str
+    requested_amount: str = ""
+    date_of_invoice: datetime
+    claim_start_date: datetime = None
+    claim_end_date: datetime = None
     media_type: MediaTypeEnum
     activity_type: ActivityTypeEnum
     comments: str = ""
@@ -100,17 +99,16 @@ class CFM(BaseModel):
             datetime: lambda v: v.strftime('%Y-%m-%d'),
         }
 
-
 class Cocktail(BaseModel):
     """Data model for individual cocktails on a menu."""
-    cocktail_name: str  # Name of the cocktail
-    brand: str  # Non-empty string that trims whitespace
-    product: str  # Non-empty string that trims whitespace
-    ingredients: List[str]  # List of non-empty strings that make up the cocktail
-    price: float  # Price of the cocktail
-    size: str  # Description of size, e.g., '500ml', '1 pint'
-    description: str  # Detailed description of the cocktail
+    cocktail_name: str
+    brand: str
+    product: str
+    ingredients: List[str]
+    price: float
+    size: str
+    description: str
 
 class Menu(BaseModel):
     """Data model for processing a cocktail menu to a schema, containing multiple cocktails."""
-    cocktails: List[Cocktail]  # List of cocktails on the menu
+    cocktails: List[Cocktail]
