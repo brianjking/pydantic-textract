@@ -1,10 +1,9 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, ValidationError
 from enum import Enum
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 class MediaTypeEnum(str, Enum):
-    """Data model for the media types on CFM invoices."""
     Print = "Print"
     Outdoor = "Outdoor"
     Point_of_Purchase = "Point of Purchase"
@@ -18,7 +17,6 @@ class MediaTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class ActivityTypeEnum(str, Enum):
-    """Data model for the CFM activity types."""
     DirectMail = "Direct Mail"
     LocalAd = "Local Ad"
     RegionalAd = "Regional Ad"
@@ -48,13 +46,12 @@ class ActivityTypeEnum(str, Enum):
     Unknown = "Unknown"
 
 class CFM(BaseModel):
-    """Data model for processing CFM co-op claim invoices and receipts."""
     vendor_merchant_name: str
     bill_invoice_amount: str
     requested_amount: str = ""
     date_of_invoice: datetime
-    claim_start_date: datetime = None
-    claim_end_date: datetime = None
+    claim_start_date: Optional[datetime] = None
+    claim_end_date: Optional[datetime] = None
     media_type: MediaTypeEnum
     activity_type: ActivityTypeEnum
     comments: str = ""
@@ -76,7 +73,7 @@ class CFM(BaseModel):
 
     @validator('activity_type', pre=True, always=True)
     def validate_activity_type(cls, v, values):
-        media_type = values.get('media_type')
+        media_type = values.get('media_type', MediaTypeEnum.Unknown)  # Default to Unknown if not provided
         valid_activities = {
             MediaTypeEnum.Print: [ActivityTypeEnum.DirectMail, ActivityTypeEnum.LocalAd, ActivityTypeEnum.RegionalAd, ActivityTypeEnum.Handouts, ActivityTypeEnum.Unknown],
             MediaTypeEnum.Outdoor: [ActivityTypeEnum.Billboards, ActivityTypeEnum.Signage, ActivityTypeEnum.Unknown],
@@ -88,19 +85,19 @@ class CFM(BaseModel):
             MediaTypeEnum.Sponsorships: [ActivityTypeEnum.Sponsorship, ActivityTypeEnum.Unknown],
             MediaTypeEnum.Signage: [ActivityTypeEnum.DealerSignage, ActivityTypeEnum.Unknown],
             MediaTypeEnum.Vehicle_Wraps: [ActivityTypeEnum.VehicleWrapsDecals, ActivityTypeEnum.Unknown],
-            MediaTypeEnum.Unknown: [ActivityTypeEnum.Unknown],
+            MediaTypeEnum.Unknown: [ActivityTypeEnum.Unknown],  # Ensures fallback to Unknown for any unhandled media types
         }
-        if media_type and v not in valid_activities.get(media_type, []):
-            raise ValueError(f"Invalid activity type '{v}' for media type '{media_type}'")
+        # Default to Unknown if the activity type is not valid for the given media type
+        if not valid_activities[media_type].__contains__(v):
+            return ActivityTypeEnum.Unknown
         return v
 
     class Config:
         json_encoders = {
-            datetime: lambda v: v.strftime('%Y-%m-%d'),
+            datetime: lambda v: v.strftime('%m-%d-%Y'),  # Adjust date format as requested
         }
 
 class Cocktail(BaseModel):
-    """Data model for individual cocktails on a menu."""
     cocktail_name: str
     brand: str
     product: str
@@ -110,5 +107,4 @@ class Cocktail(BaseModel):
     description: str
 
 class Menu(BaseModel):
-    """Data model for processing a cocktail menu to a schema, containing multiple cocktails."""
     cocktails: List[Cocktail]
