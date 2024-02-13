@@ -1,7 +1,7 @@
-from pydantic import BaseModel, validator, ValidationError, constr
+from pydantic import BaseModel, validator
 from enum import Enum
 from typing import List
-from datetime import datetime 
+from datetime import datetime
 
 
 class MediaTypeEnum(str, Enum):
@@ -74,7 +74,7 @@ class CFM(BaseModel):
         if not v:
             return values['bill_invoice_amount']
         return v
-        
+
     @validator('activity_type', pre=True, always=True)
     def validate_activity_type(cls, v, values):
         media_type = values.get('media_type')
@@ -95,20 +95,21 @@ class CFM(BaseModel):
             raise ValueError(f"Invalid activity type '{v}' for media type '{media_type}'")
         return v
 
-class Config:
+    class Config:
         json_encoders = {
             datetime: lambda v: v.strftime('%Y-%m-%d'),
         }
 
+
 class Cocktail(BaseModel):
     """Data model for individual cocktails on a menu."""
-    cocktail_name: constr(strip_whitespace=True, min_length=1)  # Name of the cocktail
-    brand: constr(strip_whitespace=True, min_length=1)  # Non-empty string that trims whitespace
-    product: constr(strip_whitespace=True, min_length=1)  # Non-empty string that trims whitespace
-    ingredients: List[constr(strip_whitespace=True, min_length=1)]  # List of non-empty strings that make up the cocktail
+    cocktail_name: str  # Name of the cocktail
+    brand: str  # Non-empty string that trims whitespace
+    product: str  # Non-empty string that trims whitespace
+    ingredients: List[str]  # List of non-empty strings that make up the cocktail
     price: float  # Price of the cocktail
-    size: constr(strip_whitespace=True, min_length=1)  # Description of size, e.g., '500ml', '1 pint'
-    description: constr(strip_whitespace=True, min_length=1)  # Detailed description of the cocktail
+    size: str  # Description of size, e.g., '500ml', '1 pint'
+    description: str  # Detailed description of the cocktail
 
 class Menu(BaseModel):
     """Data model for processing a cocktail menu to a schema, containing multiple cocktails."""
