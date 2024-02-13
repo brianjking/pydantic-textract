@@ -95,6 +95,11 @@ class CFM(BaseModel):
             raise ValueError(f"Invalid activity type '{v}' for media type '{media_type}'")
         return v
 
+class Config:
+        json_encoders = {
+            datetime: lambda v: v.strftime('%Y-%m-%d'),
+        }
+
 class Cocktail(BaseModel):
     """Data model for individual cocktails on a menu."""
     cocktail_name: constr(strip_whitespace=True, min_length=1)  # Name of the cocktail
