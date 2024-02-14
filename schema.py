@@ -103,8 +103,8 @@ class CFM(BaseModel):
 class Cocktail(BaseModel):
     """Data model for the Cocktail Menu items."""
     cocktail_name: str
-    brand: str
-    product: str
+    brands: List[str]  # Updated to accommodate multiple brands
+    products: List[str]  # Updated to accommodate multiple products
     ingredients: List[str]
     price: float
     size: str
