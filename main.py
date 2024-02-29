@@ -97,14 +97,19 @@ if uploaded_file is not None:
     image_bytes = uploaded_file.read()
     if uploaded_file.type == "application/pdf":
         images = convert_from_bytes(image_bytes)
+        extracted_texts = []  # Hold extracted text from each page
         for image in images:
             st.image(image, use_column_width=True)
+            bytes_io = io.BytesIO()
+            image.save(bytes_io, format='JPEG')
+            response = process_image_with_textract(bytes_io.getvalue())
+            extracted_texts.append(extract_text_from_textract(response))
+        extracted_text = "\n".join(extracted_texts)  # Combine text from all pages
     else:
         image = Image.open(io.BytesIO(image_bytes))
         st.image(image, caption='Uploaded Image', use_column_width=True)
-
-    textract_response = process_image_with_textract(image_bytes)
-    extracted_text = extract_text_from_textract(textract_response)
+        textract_response = process_image_with_textract(image_bytes)
+        extracted_text = extract_text_from_textract(textract_response)
 
     # Using an expander for the extracted text
     with st.expander("Extracted Text from Images"):
