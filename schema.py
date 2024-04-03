@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator, ValidationError
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Annotated
 from datetime import datetime
 
 class MediaTypeEnum(str, Enum):
@@ -62,20 +62,26 @@ class CFM(BaseModel):
     account_id_number: str = ""
     invoice: str = ""
 
+    model_config = {
+        "json_encoders": {
+            datetime: lambda v: v.strftime('%m-%d-%Y'),  # Adjust date format as requested
+        }
+    }
+
     @validator('claim_start_date', 'claim_end_date', pre=True, always=True)
-    def default_claim_dates(cls, v, values, field):
+    def default_claim_dates(cls, v, *, values):
         if v is None:
             return values['date_of_invoice']
         return v
 
     @validator('requested_amount', pre=True, always=True)
-    def default_requested_amount(cls, v, values):
+    def default_requested_amount(cls, v, *, values):
         if not v:
             return values['bill_invoice_amount']
         return v
 
     @validator('activity_type', pre=True, always=True)
-    def validate_activity_type(cls, v, values):
+    def validate_activity_type(cls, v, *, values):
         media_type = values.get('media_type', MediaTypeEnum.Unknown)  # Default to Unknown if not provided
         valid_activities = {
             MediaTypeEnum.Print: [ActivityTypeEnum.DirectMail, ActivityTypeEnum.LocalAd, ActivityTypeEnum.RegionalAd, ActivityTypeEnum.Handouts, ActivityTypeEnum.Unknown],
@@ -94,11 +100,6 @@ class CFM(BaseModel):
         if not valid_activities[media_type].__contains__(v):
             return ActivityTypeEnum.Unknown
         return v
-
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.strftime('%m-%d-%Y'),  # Adjust date format as requested
-        }
 
 class Cocktail(BaseModel):
     """Data model for the Cocktail Menu items."""

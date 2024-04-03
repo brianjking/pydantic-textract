@@ -39,7 +39,7 @@ textract_client = boto3.client(
 # OpenAI client initialization
 openai_client = OpenAI(
     model="gpt-4-0125-preview",
-    api_key=os.environ.get("openai_api_key")
+    api_key=os.environ.get("openai_api")
 )
 
 # Schema selection
