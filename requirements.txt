@@ -6,4 +6,7 @@ matplotlib
 boto3
 streamlit
 pdf2image
+fastapi
+python-multipart
+uvicorn
 
