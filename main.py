@@ -6,9 +6,10 @@ import streamlit as st
 import boto3
 from PIL import Image
 from pdf2image import convert_from_bytes
-from llama_index.program import OpenAIPydanticProgram
-from llama_index.output_parsers import PydanticOutputParser
-from llama_index.llms import OpenAI
+from llama_index.program.openai import OpenAIPydanticProgram
+from llama_index.core.output_parsers import PydanticOutputParser
+from llama_index.core import Settings
+from llama_index.llms.openai import OpenAI
 from schema import CFM, Menu, ActivityTypeEnum, MediaTypeEnum
 
 # Authentication function using environment variables for secrets
@@ -37,7 +38,7 @@ textract_client = boto3.client(
 )
 
 # OpenAI client initialization
-openai_client = OpenAI(
+Settings.llm = OpenAI(
     model="gpt-4-0125-preview",
     api_key=os.environ.get("openai_api")
 )
@@ -78,7 +79,6 @@ def call_llama_index_to_process_data(extracted_text, schema_cls, schema_name):
             output_parser=PydanticOutputParser(output_cls=schema_cls),
             output_cls=schema_cls,
             prompt_template_str=prompt_template_str,
-            llm=openai_client,
             verbose=True,
         )
         result = program()
