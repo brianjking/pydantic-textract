@@ -12,6 +12,9 @@ from llama_index.llms.openai import OpenAI
 from schema import CFM, Menu, ActivityTypeEnum, MediaTypeEnum
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 app = FastAPI()
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
@@ -19,13 +22,14 @@ api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 # AWS Textract client configuration
 textract_client = boto3.client(
     service_name='textract',
-    region_name=os.environ["aws_region_name"],
-    aws_access_key_id=os.environ["aws_access_key_id"],
-    aws_secret_access_key=os.environ["aws_secret_access_key"])
+    region_name=os.environ.get("aws_region_name", os.getenv("aws_region_name")),
+    aws_access_key_id=os.environ.get("aws_access_key_id", os.getenv("aws_access_key_id")),
+    aws_secret_access_key=os.environ.get("aws_secret_access_key", os.getenv("aws_secret_access_key"))
+)
 
 # OpenAI client initialization
 Settings.llm = OpenAI(model="gpt-4-0125-preview",
-                      api_key=os.environ["openai_api"])
+                      api_key=os.environ.get("openai_api", os.getenv("openai_api")))
 
 # Schema selection
 SCHEMA_SELECTION = {
@@ -43,7 +47,7 @@ PROMPT_TEMPLATES = {
 
 
 def authenticate(api_key: str = Security(api_key_header)):
-    correct_password = os.environ["password"]
+    correct_password = os.environ.get("password", os.getenv("password"))
     if not api_key or not hmac.compare_digest(api_key, correct_password):
         raise HTTPException(status_code=401, detail="Invalid API key")
     return True
