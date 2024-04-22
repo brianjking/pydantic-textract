@@ -9,4 +9,4 @@ pdf2image
 fastapi
 python-multipart
 uvicorn
-
+python-dotenv
