@@ -7,7 +7,8 @@
 * `pip install -r requirements.txt` (ideally in a virtualenv of some sort)
 * `mv env.example .env` to create a `.env` file to house the secrets 
 * Update the `.env` with your secrets
-* uvicorn main:app --reload
+* `uvicorn main:app --reload`
+* Visit https://localhost:8000/docs or simply do a cURL / Postman call using the details below.
 
 ## Making An API Call via Postman/cURL
 
