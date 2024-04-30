@@ -1,6 +1,7 @@
 import os
 import hmac
 import io
+import traceback
 from pydantic import BaseModel, ValidationError
 import boto3
 from PIL import Image
@@ -22,14 +23,17 @@ api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 # AWS Textract client configuration
 textract_client = boto3.client(
     service_name='textract',
-    region_name=os.environ.get("aws_region_name", os.getenv("aws_region_name")),
-    aws_access_key_id=os.environ.get("aws_access_key_id", os.getenv("aws_access_key_id")),
-    aws_secret_access_key=os.environ.get("aws_secret_access_key", os.getenv("aws_secret_access_key"))
-)
+    region_name=os.environ.get("aws_region_name",
+                               os.getenv("aws_region_name")),
+    aws_access_key_id=os.environ.get("aws_access_key_id",
+                                     os.getenv("aws_access_key_id")),
+    aws_secret_access_key=os.environ.get("aws_secret_access_key",
+                                         os.getenv("aws_secret_access_key")))
 
 # OpenAI client initialization
 Settings.llm = OpenAI(model="gpt-4-0125-preview",
-                      api_key=os.environ.get("openai_api", os.getenv("openai_api")))
+                      api_key=os.environ.get("openai_api",
+                                             os.getenv("openai_api")))
 
 # Schema selection
 SCHEMA_SELECTION = {
@@ -73,21 +77,23 @@ def extract_text_from_textract(textract_response):
 
 
 def call_llama_index_to_process_data(extracted_text, schema_cls, schema_name):
-    prompt_template_str = PROMPT_TEMPLATES[schema_name].format(
-        text=extracted_text)
+    prompt_template_str = PROMPT_TEMPLATES[schema_name]
     try:
+        print(f"Extracted Text: {extracted_text}")
+        print(f"Prompt Template: {prompt_template_str}")
         program = OpenAIPydanticProgram.from_defaults(
             output_parser=PydanticOutputParser(output_cls=schema_cls),
             output_cls=schema_cls,
             prompt_template_str=prompt_template_str,
             verbose=True,
         )
-        result = program()
+        result = program(text=extracted_text)
         return result
     except Exception as e:
+        error_details = traceback.format_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error generating schema with LlamaIndex: {str(e)}")
+            detail=f"Error generating schema with LlamaIndex: {str(e)}\nTraceback: {error_details}")
 
 
 @app.post("/process_document/{schema_name}")
